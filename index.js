@@ -4,10 +4,41 @@ const app = (module.express = express());
 const port = process.env.PORT || 3000;
 const hostname = '0.0.0.0';
 const users = require('./controllers/users')();
+const usersModel = require('./models/users')();
 const projects = require ('./controllers/projects')();
 const issues = require('./controllers/issues')();
 const comments = require('./controllers/comments')();
 
+
+app.use(async (req, res, next) => {
+  const ErrorMessage = {
+      error: 'Error Authorize',
+      message: 'Permission denied',
+      code: 'xxx',
+    };
+
+    const suppliedKey = req.headers['x-api-key'];
+    const clientIp =
+        req.header['x-forwarded-for'] || req.connection.remoteAddress;
+
+            if(!suppliedKey) {
+            console.log('Error authorize, no key supplied');
+            new Date(), clientIp;
+            ErrorMessage.code = '01';
+            return res.status(401).json(ErrorMessage);
+        }
+
+
+    const users = await usersModel.getByKey(suppliedKey);
+
+            if(!users) {
+            ErrorMessage.code = '02';
+            return res.status(401).json(ErrorMessage);
+        }
+
+        next();
+    });
+        
 app.use(bodyParser.json());
 
 app.get('/users',users.getController);
@@ -36,4 +67,11 @@ app.get('/', (req, res)=>{
 
 app.listen(port, hostname, ()=>{
     console.log (`App Listening at http://${hostname}:${port}`);
- })
+ });
+
+ app.use((req, res) => {
+     res.status(404).json({
+         error: 404,
+         message: 'Route not found',
+        });
+    });
