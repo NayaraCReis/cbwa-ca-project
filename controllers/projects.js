@@ -2,25 +2,44 @@ const projects = require('../models/projects')();
 
 module.exports = () => {
     const getController = async (req, res) => {
-    res.json(await projects.get());
-};
-const getBySlug = async (req, res) => {
-res.json(await projects.get(req.params.slug));
-};
+        const { slug, error } = await projects.get();
 
-const postController = async (req, res)=> {
-    let name = req.body.name;
-    let slug = req.body.slug;
-    let description = req.body.description;
-    
+        if (error) {
+            res.status(500).json({
+                error,
+            });
+        }
+        res.json(slug);
+    };
 
-    const result = await projects.add(slug, name, description);
-    res.json(result);
+    const getBySlug = async (req, res) => {
+        const { slug, error } = await projects.get(req.params.slugName);
 
-}  
-return {
-    getBySlug,
-    getController,
-    postController,
-};
+        if (error) {
+            res.status(500).json({
+                error,
+            });
+        }
+        res.json(slug);
+    };
+
+    const postController = async (req, res) => {
+        let title = req.body.title;
+        let slugName = req.body.slugName;
+        let description = req.body.description;
+
+
+        const { result, error } = await projects.add(slugName, title, description);
+        if (error) {
+            res.status(500).json({
+                error,
+            });
+        }
+        res.json(result);
+    };
+    return {
+        getBySlug,
+        getController,
+        postController,
+    };
 };

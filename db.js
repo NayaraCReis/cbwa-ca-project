@@ -6,84 +6,123 @@ const DB_NAME = 'cbwa-ca';
 
 module.exports = () => {
     const get = (collectionName, query = {}) => {
- return new Promise((resolve, reject)=> { 
-     MongoClient.connect(uri, MONGO_OPTIONS, (err, client) => {
-    const db = client.db(DB_NAME);
-    const collection = db.collection(collectionName);
-    collection.find(query).toArray((err, docs) => {
-        resolve(docs);
-        client.close();
- });
-});
-}); 
-       
-};
+        return new Promise((resolve, reject) => {
+            MongoClient.connect(uri, MONGO_OPTIONS, (err, client) => {
+                if (err) {
+                    console.log(err);
+                    return reject("****** Network error ******");
+                }
 
-const add = (collectionName, entry) => {
+                const db = client.db(DB_NAME);
+                const collection = db.collection(collectionName);
+                collection.find(query).toArray((err, docs) => {
+                    if (err) {
+                        console.log(err);
+                        return reject("****** Find error ******");
+                    }
+                    resolve(docs);
+                    client.close();
+                });
+            });
+        });
 
-    return new Promise((resolve, reject) =>{
-    MongoClient.connect(uri, MONGO_OPTIONS, (err, client) =>{
-        const db = client.db(DB_NAME);
-        const collection = db.collection(collectionName);
-        collection.insertOne(entry, (err, result ) =>{
-            resolve(result);
-            client.close();
-     }) 
-    }) 
-  })
-}; 
+    };
 
-const count = (collectionName) => {
+    const add = (collectionName, entry) => {
 
-    return new Promise((resolve, reject) => {
-    MongoClient.connect(uri, MONGO_OPTIONS, (err, client) =>{
-        const db = client.db(DB_NAME);
-        const collection = db.collection(collectionName);
-        collection.countDocuments({}, (err, result ) => {
-            resolve(result);
-            client.close();
-     }) 
-    }) 
-    })
+        return new Promise((resolve, reject) => {
+            MongoClient.connect(uri, MONGO_OPTIONS, (err, client) => {
+                if (err) {
+                    console.log(err);
+                    return reject("****** Network error ******");
+                }
+                const db = client.db(DB_NAME);
+                const collection = db.collection(collectionName);
+                collection.insertOne(entry, (err, result) => {
+                    if (err) {
+                        console.log(err);
+                        return reject("****** Insert error ******");
+                    }
+                    resolve(result);
+                    client.close();
+                })
+            })
+        })
+    };
 
-}; 
+    const count = (collectionName) => {
 
-const update = (collectionName, pipeline) => {
+        return new Promise((resolve, reject) => {
+            MongoClient.connect(uri, MONGO_OPTIONS, (err, client) => {
+                if (err) {
+                    console.log(err);
+                    return reject("****** Network error ******");
+                }
+                const db = client.db(DB_NAME);
+                const collection = db.collection(collectionName);
+                collection.countDocuments({}, (err, result) => {
+                    if (err) {
+                        console.log(err);
+                        return reject("****** Count error ******");
+                    }
+                    resolve(result);
+                    client.close();
+                })
+            })
+        })
 
-    return new Promise((resolve, reject) =>{
-    MongoClient.connect(uri, MONGO_OPTIONS, (err, client) =>{
-        const db = client.db(DB_NAME);
-        const collection = db.collection(collectionName);
-        collection.updateOne(pipeline [0],pipeline [1], (err, result ) =>{
-            resolve(result);
-            client.close();
-     }) 
-    }) 
-  })
-}; 
+    };
 
-const aggregate = (collectionName, pipeline =[]) => {
-    return new Promise((resolve, reject) => {
-    MongoClient.connect(uri, MONGO_OPTIONS, (err, client) => {
-    const db = client.db(DB_NAME);
-    const collection = db.collection(collectionName);
-    collection.aggregate(pipeline).toArray((err, docs) => {
-        if(err){
-            console.log(err);
-        }
-        resolve(docs);
-        client.close();
- });
-});
-});
-};
+    const update = (collectionName, pipeline) => {
 
-return {
-    get,
-    add,
-    count,
-    update,
-    aggregate
+        return new Promise((resolve, reject) => {
+            MongoClient.connect(uri, MONGO_OPTIONS, (err, client) => {
+                if (err) {
+                    console.log(err);
+                    return reject("****** Network error ******");
+                }
+                const db = client.db(DB_NAME);
+                const collection = db.collection(collectionName);
+                collection.updateOne(pipeline[0], pipeline[1], (err, result) => {
+                    if (err) {
+                        console.log(err);
+                        return reject("****** Update error ******");
+                    }
+                    resolve(result);
+                    client.close();
+                })
+            })
+        })
+    };
+
+    const aggregate = (collectionName, pipeline = []) => {
+        return new Promise((resolve, reject) => {
+            MongoClient.connect(uri, MONGO_OPTIONS, (err, client) => {
+                if (err) {
+                    console.log(err);
+                    return reject("****** Network error ******");
+                }
+                const db = client.db(DB_NAME);
+                const collection = db.collection(collectionName);
+
+                collection.aggregate(pipeline).toArray((err, docs) => {
+                    if (err) {
+                        console.log(err);
+                        return reject("****** aggregate error ******");
+                    }
+                    resolve(docs);
+                    client.close();
+                });
+            });
+        });
+    };
+
+    return {
+        get,
+        add,
+        count,
+        update,
+        aggregate
 
     };
 };

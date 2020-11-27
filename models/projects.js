@@ -1,29 +1,60 @@
 const db = require('../db')();
 const COLLECTION = 'projects';
 
-module.exports = () => { 
+module.exports = () => {
 
-    const get = async (slug = null) =>{
-        if(!slug){
-        const totalSlug = await db.get(COLLECTION);
-        return totalSlug;
-    }
-    const uniqueSlug = await db.get(COLLECTION, {slug});
-    return uniqueSlug;
-    };
-
-    const add = async(slug, name, description) =>{
-        const results = await db.add(COLLECTION, {
-            slug: slug,
-            name: name,
-            description: description,
+    const get = async (slugName = null) => {
+        try {
+        if (!slugName) {
+                const slug = await db.get(COLLECTION);
+                return { slug };
+            } 
+            const slug = await db.get(COLLECTION, {
+            slug: slugName,
         });
+            return { slug };
+        } catch (err) {
+            console.log(err);
+            return {
+                error: err,
+            };
+        }
+    }
 
-        return results.result;
+    const add = async (slugName, title, description) => {
+        if(!slugName || !title || !description) {
+            return {
+                error: 'fill in all fields',
+            };
+        }
+        try {
+            const slugName = await db.get(COLLECTION, {
+                slug: slugName,
+            });
+
+            if (slugName.length > 0) {
+                return {
+                    result: 'Project already exists',
+                };
+            }
+            
+            const results = await db.add(COLLECTION, {
+                slugName: slugName,
+                title: title,
+                description: description,
+            });
+
+            return {results};
+        } catch (err) {
+            console.log(err);
+            return {
+                error: err,
+            };
+        }
     };
-  return {
-      get,
-      add
+    return {
+        get,
+        add,
 
-};
+    };
 };
