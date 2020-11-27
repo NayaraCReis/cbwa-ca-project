@@ -25,7 +25,7 @@ The project only support format JSON file
 * Create your ENV variables: MONGO_URI, EMAIL and PASSWORD 
 * The variables should be set in your environment
 
-Installation
+### Installation
 $ git clone git@github.com:NayaraCReis/cbwa-ca-project.git
 $ npm install
 
@@ -37,7 +37,7 @@ List of features ready and TODOs for future development
 * Add users, projects, issues and comments
 * retrieving all and individual list elements
 
-GET METHODS:
+*GET METHODS:*
 Get all users
 /users
 
@@ -66,7 +66,7 @@ Get a single comment
 Get all comments for an issue 
 /issues/:issueNumber/comments
 
-POST METHODS:
+*POST METHODS:*
 Add a user 
 /users
 
